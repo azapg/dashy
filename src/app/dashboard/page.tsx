@@ -11,7 +11,7 @@ import {
 import React from "react";
 import {temperatureColumns, TemperatureDataPoint} from "@/experiments/temperature/columns";
 
-import data from './data.json'
+import data from '@/../public/data.json'
 
 const temperatures: TemperatureDataPoint[] = data.temperature.map(point => {
   return {
