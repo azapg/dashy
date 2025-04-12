@@ -1,6 +1,6 @@
 "use client"
 
-import {IconCirclePlusFilled, type Icon} from "@tabler/icons-react"
+import {IconCirclePlusFilled, type Icon, IconTemperatureCelsius, IconDroplets} from "@tabler/icons-react"
 
 import {
   SidebarGroup,
@@ -41,14 +41,18 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         { adminView ? <CreateExperimentButton /> : null }
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title}>
-                {item.icon && <item.icon/>}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          <SidebarMenuItem key="Experimento Temperatura" className="bg-accent rounded-md">
+            <SidebarMenuButton tooltip="Experimento Temperatura">
+              <IconTemperatureCelsius />
+              <span>Experimento Temperatura</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem key="Experimento Humedad" className="rounded-md opacity-50">
+            <SidebarMenuButton tooltip="Experimento Humedad">
+              <IconDroplets />
+              <span>Experimento Humedad</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
