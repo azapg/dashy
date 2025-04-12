@@ -2,10 +2,7 @@
 
 import * as React from "react"
 import {
-  IconCamera,
   IconDatabase,
-  IconFileAi,
-  IconFileDescription,
   IconBrain,
   IconReport,
   IconSettings,
