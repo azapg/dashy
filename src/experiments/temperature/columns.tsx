@@ -42,6 +42,6 @@ export const temperatureColumns: ColumnDef<TemperatureDataPoint>[] = [
   },
   {
     accessorKey: "device",
-    header: "Dispositivo"
+    header: "Dispositivo",
   }
 ]
