@@ -34,6 +34,7 @@ import {parseTimeRange} from "@/lib/parse";
 export const description = "Un gráfico de área interactivo"
 
 import {TemperatureDataPoint} from "@/experiments/temperature/columns";
+import {formatDate} from "@/lib/date";
 
 const chartConfig = {
   visitors: {
@@ -58,8 +59,6 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile()
   const [timeRange, setTimeRange] = React.useState("automático")
 
-
-  // TODO: new data is not filtered. This is designed to display days in the x axis
   const filteredData = data.filter((item) => {
     const date = new Date(item.timestamp)
     const now = new Date();
@@ -151,17 +150,14 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
             </defs>
             <CartesianGrid vertical={false}/>
             <XAxis
-              dataKey="ts"
+              dataKey="timestamp"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
                 const date = new Date(value)
-                return date.toLocaleDateString("es-US", {
-                  month: "short",
-                  day: "numeric",
-                })
+                return formatDate(date)
               }}
             />
             <ChartTooltip

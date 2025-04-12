@@ -13,7 +13,7 @@ import {
 import React, {useEffect} from "react";
 import {temperatureColumns, TemperatureDataPoint} from "@/experiments/temperature/columns";
 
-function useDynamicPlaceholderData(addFn: () => TemperatureDataPoint, interval = 3000) {
+function useDynamicPlaceholderData(addFn: () => TemperatureDataPoint, interval = 1000) {
   const [data, setData] = React.useState<TemperatureDataPoint[]>([])
 
   useEffect(() => {
