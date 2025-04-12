@@ -62,7 +62,7 @@ export default function Page() {
                 <ChartAreaInteractive data={temperatures}/>
               </div>
               <div className="px-4 lg:px-6">
-                <DataTable columns={temperatureColumns} data={temperatures} />
+                <DataTable columns={temperatureColumns} data={temperatures.toReversed()} />
               </div>
             </div>
           </div>
