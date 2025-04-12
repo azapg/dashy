@@ -1,11 +1,11 @@
 "use client"
 
 import {
-  IconCreditCard,
+  IconSettings,
   IconDotsVertical,
   IconLogout,
   IconNotification,
-  IconUserCircle,
+  IconLockPassword,
 } from "@tabler/icons-react"
 
 import {
@@ -39,6 +39,13 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  let nameInitials: string;
+
+  if(!user.name) {
+    nameInitials = "A"
+  } else {
+    nameInitials = user.name.at(0) ?? "A";
+  }
 
   return (
     <SidebarMenu>
@@ -72,7 +79,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{nameInitials.toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -85,22 +92,22 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconUserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
+                <IconLockPassword />
+                Tokens
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <IconNotification />
-                Notifications
+                Notificaciones
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <IconSettings />
+                Configuración
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
+            <DropdownMenuItem className="bg-red-800">
+              <IconLogout/>
+              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
