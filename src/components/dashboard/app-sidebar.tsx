@@ -6,7 +6,6 @@ import {
   IconBrain,
   IconReport,
   IconSettings,
-  IconTemperatureCelsius
 } from "@tabler/icons-react"
 
 import { NavDocuments } from "@/components/dashboard/nav-documents"
@@ -28,13 +27,6 @@ const data = {
     email: "allan@einsteins.team",
     avatar: "https://cdn.discordapp.com/emojis/914993708913545236.webp?size=128",
   },
-  navMain: [
-    {
-      title: "Experimento Temperatura",
-      url: "#",
-      icon: IconTemperatureCelsius,
-    }
-  ],
   navSecondary: [
     {
       title: "Configuración",
@@ -75,7 +67,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
         <NavDocuments items={data.documents} />
       </SidebarContent>
       <SidebarFooter>

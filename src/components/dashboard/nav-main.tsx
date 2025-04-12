@@ -1,6 +1,6 @@
 "use client"
 
-import {IconCirclePlusFilled, type Icon, IconTemperatureCelsius, IconDroplets} from "@tabler/icons-react"
+import {IconCirclePlusFilled, IconTemperatureCelsius, IconDroplets} from "@tabler/icons-react"
 
 import {
   SidebarGroup,
@@ -26,15 +26,7 @@ const CreateExperimentButton = () => (
   </SidebarMenu>
 )
 
-export function NavMain({
-                          items,
-                        }: {
-  items: {
-    title: string
-    url: string
-    icon?: Icon
-  }[]
-}) {
+export function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Paneles</SidebarGroupLabel>
