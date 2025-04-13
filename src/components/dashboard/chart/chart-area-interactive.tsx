@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import {Area, AreaChart, CartesianGrid, XAxis} from "recharts"
+import {Line, LineChart, CartesianGrid, XAxis, YAxis} from "recharts"
 
 import {useIsMobile} from "@/hooks/use-mobile"
 import {
@@ -37,17 +37,10 @@ import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 import {formatDate} from "@/lib/date";
 
 const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  desktop: {
-    label: "Desktop",
-    color: "var(--primary)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--primary)",
-  },
+  temperature: {
+    label: "Temperatura",
+    color: "var(--secondary)",
+  }
 } satisfies ChartConfig
 
 
@@ -55,6 +48,12 @@ interface ChartAreaInteractiveProps {
   data: TemperatureDataPoint[]
 }
 
+
+// TODO: For now, this chart should only show the last minute data just like
+//  ThingsBoard's charts. The x-axis would always update by one second, so one
+//  second appears on the right and one disappears on the left, and every five
+//  seconds, a tick must be drawn. Also, the x-axis should behave like this even
+//  when there is no data to display.
 export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile()
   const [timeRange, setTimeRange] = React.useState("automático")
@@ -116,43 +115,22 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
           </Select>
         </CardAction>
       </CardHeader>
+      {/* chart */}
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={filteredData}>
-            <defs>
-              <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={1.0}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-desktop)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-              <linearGradient id="fillMobile" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="5%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.8}
-                />
-                <stop
-                  offset="95%"
-                  stopColor="var(--color-mobile)"
-                  stopOpacity={0.1}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false}/>
+          <LineChart
+            data={data}
+          >
+           <CartesianGrid vertical={false} />
             <XAxis
               dataKey="timestamp"
-              tickLine={false}
-              axisLine={false}
+              domain={['auto', 'auto']}
+              interval={"equidistantPreserveStart"}
+              name="Tiempo"
+              type={"number"}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
@@ -160,29 +138,24 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
                 return formatDate(date)
               }}
             />
+            <YAxis />
             <ChartTooltip
-              cursor={false}
-              defaultIndex={isMobile ? -1 : 10}
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("es-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
-                  indicator="dot"
+                  className="w-[150px]"
+                  nameKey={"temperature"}
                 />
               }
             />
-            <Area
-              dataKey="value"
-              type="natural"
-              fill="url(#fillMobile)"
-              stroke="var(--color-mobile)"
-              stackId="a"
+            <Line
+              dataKey={"value"}
+              type={"linear"}
+              stroke={"blue"}
+              strokeWidth={2}
+              dot={false}
+              isAnimationActive={false}
             />
-          </AreaChart>
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
