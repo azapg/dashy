@@ -1,7 +1,7 @@
 'use client';
 
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
-import { ChartAreaInteractive } from "@/components/dashboard/chart/chart-area-interactive"
+import { ChartTimeseriesInteractive } from "@/components/dashboard/chart/chart-timeseries-interactive"
 import { DataTable } from "@/components/dashboard/table/data-table"
 import { SectionCards } from "@/components/dashboard/section-cards"
 import { SiteHeader } from "@/components/dashboard/site-header"
@@ -59,7 +59,7 @@ export default function Page() {
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <SectionCards />
               <div className="px-4 lg:px-6">
-                <ChartAreaInteractive data={temperatures}/>
+                <ChartTimeseriesInteractive data={temperatures}/>
               </div>
               <div className="px-4 lg:px-6">
                 <DataTable columns={temperatureColumns} data={temperatures.toReversed()} />

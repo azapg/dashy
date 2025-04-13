@@ -3,7 +3,6 @@
 import * as React from "react"
 import {Line, LineChart, CartesianGrid, XAxis, YAxis} from "recharts"
 
-import {useIsMobile} from "@/hooks/use-mobile"
 import {
   Card,
   CardAction,
@@ -35,6 +34,7 @@ export const description = "Un gráfico de área interactivo"
 
 import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 import {formatDate} from "@/lib/date";
+import {useEffect} from "react";
 
 const chartConfig = {
   temperature: {
@@ -48,24 +48,56 @@ interface ChartAreaInteractiveProps {
   data: TemperatureDataPoint[]
 }
 
+const useDynamicAxisData = (): [number, number, number[]] => {
+  const [min, setMin] = React.useState(0)
+  const [max, setMax] = React.useState(0)
+  const [ticks, setTicks] = React.useState<number[]>([])
 
-// TODO: For now, this chart should only show the last minute data just like
-//  ThingsBoard's charts. The x-axis would always update by one second, so one
-//  second appears on the right and one disappears on the left, and every five
-//  seconds, a tick must be drawn. Also, the x-axis should behave like this even
-//  when there is no data to display.
-export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
-  const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("automático")
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
 
-  const filteredData = data.filter((item) => {
-    const date = new Date(item.timestamp)
-    const now = new Date();
+      const currentSeconds = now.getSeconds();
+      const secondsRemainder = currentSeconds % 5;
+      const mostRecentFiveSecMark = new Date(now);
+      mostRecentFiveSecMark.setMilliseconds(0);
+      mostRecentFiveSecMark.setSeconds(currentSeconds - secondsRemainder);
 
-    return date.getSeconds() < now.getSeconds() + 10;
-  })
+      const timestamps = [];
+      for (let i = 0; i < 12; i++) {
+        const tickTime = new Date(mostRecentFiveSecMark);
+        tickTime.setSeconds(mostRecentFiveSecMark.getSeconds() - (i * 5));
+        timestamps.push(tickTime.getTime());
+      }
+
+      timestamps.reverse();
+
+      setMin(timestamps[0]);
+      setMax(timestamps[timestamps.length - 1]);
+      setTicks(timestamps);
+    }
+
+    update()
+
+    const id = setInterval(() => update(), 1000)
+    return () => clearInterval(id)
+  }, []);
+
+  return [min, max, ticks]
+}
+
+// TODO: recharts sucks, use an alternative
+export function ChartTimeseriesInteractive({data}: ChartAreaInteractiveProps) {
+  const [timeRange, setTimeRange] = React.useState("timeseries")
+  const [min, max, ticks] = useDynamicAxisData();
+
+  console.log(ticks)
 
   const parsedRange = parseTimeRange(timeRange);
+
+  const filteredData = data.filter(point => {
+    return point.timestamp >= min - 1000;
+  })
 
   return (
     <Card className="@container/card">
@@ -85,10 +117,10 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
           >
-            <ToggleGroupItem value="30d">Últimos 30 días</ToggleGroupItem>
-            <ToggleGroupItem value="7d">Últimos 7 días</ToggleGroupItem>
-            <ToggleGroupItem value="1d">Últimas 24 horas</ToggleGroupItem>
-            <ToggleGroupItem value="auto">Automático</ToggleGroupItem>
+            <ToggleGroupItem value="30d" disabled>Últimos 30 días</ToggleGroupItem>
+            <ToggleGroupItem value="7d" disabled>Últimos 7 días</ToggleGroupItem>
+            <ToggleGroupItem value="1d" disabled>Últimas 24 horas</ToggleGroupItem>
+            <ToggleGroupItem value="timeseries">Time series</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
@@ -108,8 +140,8 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
               <SelectItem value="1d" className="rounded-lg">
                 Últimas 24 horas
               </SelectItem>
-              <SelectItem value="auto" className="rounded-lg">
-                Automático
+              <SelectItem value="timeseries" className="rounded-lg">
+                Time series
               </SelectItem>
             </SelectContent>
           </Select>
@@ -122,15 +154,15 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
           className="aspect-auto h-[250px] w-full"
         >
           <LineChart
-            data={data}
+            data={filteredData}
           >
            <CartesianGrid vertical={false} />
             <XAxis
               dataKey="timestamp"
-              domain={['auto', 'auto']}
-              interval={"equidistantPreserveStart"}
+              domain={[min, max]}
               name="Tiempo"
               type={"number"}
+              ticks={ticks}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
@@ -138,7 +170,7 @@ export function ChartAreaInteractive({data}: ChartAreaInteractiveProps) {
                 return formatDate(date)
               }}
             />
-            <YAxis />
+            <YAxis domain={['auto', 'auto']}/>
             <ChartTooltip
               content={
                 <ChartTooltipContent
