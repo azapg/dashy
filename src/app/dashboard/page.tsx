@@ -34,9 +34,14 @@ function useDynamicPlaceholderData(addFn: () => TemperatureDataPoint, interval =
 
 const useWebSocketData = () => {
   const [data, setData] = React.useState<TemperatureDataPoint[]>([])
+  const DASHY_SERVER_URL = process.env.NEXT_PUBLIC_DASHY_SERVER_URL;
+
+  if(!DASHY_SERVER_URL) {
+    throw new Error("No DASHY_SERVER_URL provided");
+  }
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000");
+    const ws = new WebSocket(DASHY_SERVER_URL);
     ws.onopen = () => { console.log('Connected to Dashy server') }
     ws.onclose = () => { console.log('Disconnected from Dashy server') }
 
@@ -45,7 +50,7 @@ const useWebSocketData = () => {
     }
 
     return () => { ws.close() }
-  }, [])
+  }, [DASHY_SERVER_URL])
 
   return data;
 }

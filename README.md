@@ -22,6 +22,10 @@ Luego instala las dependencias con:
 npm install
 ```
 
+Por último, Dashy requiere cierta configuración para funcionar correctamente:
+```env
+NEXT_PUBLIC_DASHY_SERVER_URL=ws://localhost:4000/
+```
 
 ## Ejecución en entorno de desarrollo
 Una vez instalado el código fuente, se puede crear un entorno de desarrollo ejecutando el siguiente comando en la terminal con dirección a la carpeta del código fuente. Asegúrese de tener instalado [Node.js](https://nodejs.org/en) en su computadora.
