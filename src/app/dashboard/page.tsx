@@ -31,16 +31,36 @@ function useDynamicPlaceholderData(addFn: () => TemperatureDataPoint, interval =
   return data
 }
 
+
+const useWebSocketData = () => {
+  const [data, setData] = React.useState<TemperatureDataPoint[]>([])
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:4000");
+    ws.onopen = () => { console.log('Connected to Dashy server') }
+    ws.onclose = () => { console.log('Disconnected from Dashy server') }
+
+    ws.onmessage = (event: MessageEvent) => {
+      setData(data => [...data, JSON.parse(event.data)])
+    }
+
+    return () => { ws.close() }
+  }, [])
+
+  return data;
+}
 export default function Page() {
 
-  const temperatures = useDynamicPlaceholderData((): TemperatureDataPoint => {
-    const randomTemperature = Math.random() * (28 - 19) + 19;
-    return {
-      timestamp: new Date().getTime(),
-      value: Number(randomTemperature.toFixed(1)),
-      device: "Cheap Sensor"
-    }
-  })
+  // const temperatures = useDynamicPlaceholderData((): TemperatureDataPoint => {
+  //   const randomTemperature = Math.random() * (28 - 19) + 19;
+  //   return {
+  //     timestamp: new Date().getTime(),
+  //     value: Number(randomTemperature.toFixed(1)),
+  //     device: "Cheap Sensor"
+  //   }
+  // })
+
+  const temperatures = useWebSocketData();
 
   return (
     <SidebarProvider
