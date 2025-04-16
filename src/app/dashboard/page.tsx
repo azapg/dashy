@@ -10,61 +10,11 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 
-import React, {useEffect} from "react";
-import {temperatureColumns, TemperatureDataPoint} from "@/experiments/temperature/columns";
+import React from "react";
+import {temperatureColumns} from "@/experiments/temperature/columns";
+import {useWebSocketData} from "@/hooks/use-websocket-data";
 
-function useDynamicPlaceholderData(addFn: () => TemperatureDataPoint, interval = 1000) {
-  const [data, setData] = React.useState<TemperatureDataPoint[]>([])
-
-  useEffect(() => {
-    const executeAndUpdate = () => {
-      const newPoint = addFn()
-      setData(prevPoints => [...prevPoints, newPoint])
-    }
-
-    executeAndUpdate()
-    const id = setInterval(executeAndUpdate, interval)
-
-    return () => clearInterval(id)
-  }, [interval]);
-
-  return data
-}
-
-
-const useWebSocketData = () => {
-  const [data, setData] = React.useState<TemperatureDataPoint[]>([])
-  const DASHY_SERVER_URL = process.env.NEXT_PUBLIC_DASHY_SERVER_URL;
-
-  if(!DASHY_SERVER_URL) {
-    throw new Error("No DASHY_SERVER_URL provided");
-  }
-
-  useEffect(() => {
-    const ws = new WebSocket(DASHY_SERVER_URL);
-    ws.onopen = () => { console.log('Connected to Dashy server') }
-    ws.onclose = () => { console.log('Disconnected from Dashy server') }
-
-    ws.onmessage = (event: MessageEvent) => {
-      setData(data => [...data, JSON.parse(event.data)])
-    }
-
-    return () => { ws.close() }
-  }, [DASHY_SERVER_URL])
-
-  return data;
-}
 export default function Page() {
-
-  // const temperatures = useDynamicPlaceholderData((): TemperatureDataPoint => {
-  //   const randomTemperature = Math.random() * (28 - 19) + 19;
-  //   return {
-  //     timestamp: new Date().getTime(),
-  //     value: Number(randomTemperature.toFixed(1)),
-  //     device: "Cheap Sensor"
-  //   }
-  // })
-
   const temperatures = useWebSocketData();
 
   return (
