@@ -3,7 +3,6 @@
 import { AppSidebar } from "@/components/dashboard/app-sidebar"
 import { ChartTimeseriesInteractive } from "@/components/dashboard/chart/chart-timeseries-interactive"
 import { DataTable } from "@/components/dashboard/table/data-table"
-import { SectionCards } from "@/components/dashboard/section-cards"
 import { SiteHeader } from "@/components/dashboard/site-header"
 import {
   SidebarInset,
@@ -32,7 +31,7 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards />
+              {/*<SectionCards rate={rateStat} temperature={temperatureStat}/>*/}
               <div className="px-4 lg:px-6">
                 <ChartTimeseriesInteractive data={temperatures}/>
               </div>

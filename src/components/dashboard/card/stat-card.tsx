@@ -1,0 +1,32 @@
+import {Card, CardAction, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {TrendBadge} from "@/components/dashboard/card/trend-badge";
+import {Trend} from "@/lib/stats";
+
+type StatCardData = {
+  legend: string;
+  value: number;
+  unit?: string;
+  trend: Trend
+}
+
+export function StatCard({legend, value, trend, unit}: StatCardData) {
+  let enoughData = true;
+
+  if(!value || !trend) {
+    enoughData = false;
+  }
+
+  console.log(trend.percentage, legend)
+
+  return <Card className="@container/card">
+    <CardHeader>
+      <CardDescription>{legend}</CardDescription>
+      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        {enoughData ? <>{value} {unit ?? <></>}</> : "Sin datos"}
+      </CardTitle>
+      <CardAction>
+        <TrendBadge trend={trend}/>
+      </CardAction>
+    </CardHeader>
+  </Card>;
+}
