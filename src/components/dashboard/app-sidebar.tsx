@@ -8,8 +8,8 @@ import {
   IconSettings,
 } from "@tabler/icons-react"
 
-import { NavDocuments } from "@/components/dashboard/nav-documents"
-import { NavMain } from "@/components/dashboard/nav-main"
+import {NavDocuments} from "@/components/dashboard/nav-documents"
+import {NavMain} from "@/components/dashboard/nav-main"
 import {
   Sidebar,
   SidebarContent,
@@ -46,7 +46,11 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  selected?: number;
+};
+
+export function AppSidebar({selected, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -57,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <div>
-                <IconBrain className="!size-5" />
+                <IconBrain className="!size-5"/>
                 <span className="text-base font-semibold">Grupo Einsteins</span>
               </div>
             </SidebarMenuButton>
@@ -65,8 +69,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain />
-        <NavDocuments items={data.documents} />
+        <NavMain selected={selected}/>
+        <NavDocuments items={data.documents}/>
       </SidebarContent>
     </Sidebar>
   )

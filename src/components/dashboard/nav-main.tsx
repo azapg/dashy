@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import Link from "next/link";
 
 const adminView = false;
 
@@ -19,29 +20,35 @@ const CreateExperimentButton = () => (
         tooltip="Quick Create"
         className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
       >
-        <IconCirclePlusFilled />
+        <IconCirclePlusFilled/>
         <span>Crear nuevo experimento</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   </SidebarMenu>
 )
 
-export function NavMain() {
+interface NavMainProps {
+  selected?: number | undefined
+}
+
+export function NavMain({selected}: NavMainProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Paneles</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
-        { adminView ? <CreateExperimentButton /> : null }
+        {adminView ? <CreateExperimentButton/> : null}
         <SidebarMenu>
-          <SidebarMenuItem key="Experimento Temperatura" className="bg-accent rounded-md">
-            <SidebarMenuButton tooltip="Experimento Temperatura">
-              <IconTemperatureCelsius />
-              <span>Experimento Temperatura</span>
-            </SidebarMenuButton>
+          <SidebarMenuItem key="Experimento Temperatura" className={`${selected == 1 ? 'bg-accent' : ''} rounded-md`}>
+            <Link href="/dashboard/temperatura">
+              <SidebarMenuButton tooltip="Experimento Temperatura">
+                <IconTemperatureCelsius/>
+                <span>Experimento Temperatura</span>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
           <SidebarMenuItem key="Experimento Humedad" className="rounded-md opacity-50">
             <SidebarMenuButton tooltip="Experimento Humedad">
-              <IconDroplets />
+              <IconDroplets/>
               <span>Experimento Humedad</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
