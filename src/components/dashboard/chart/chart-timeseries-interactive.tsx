@@ -91,8 +91,6 @@ export function ChartTimeseriesInteractive({data}: ChartAreaInteractiveProps) {
   const [timeRange, setTimeRange] = React.useState("timeseries")
   const [min, max, ticks] = useDynamicAxisData();
 
-  console.log(ticks)
-
   const parsedRange = parseTimeRange(timeRange);
 
   const filteredData = data.filter(point => {
