@@ -17,7 +17,14 @@ export const useWebSocketData = () => {
     ws.onclose = () => { console.log('Disconnected from Dashy server') }
 
     ws.onmessage = (event: MessageEvent) => {
-      setData(data => [...data, JSON.parse(event.data)])
+      const parsed = JSON.parse(event.data);
+      const point: TemperatureDataPoint = {
+        timestamp: Number(parsed.timestamp),
+        value: Number(parsed.value),
+        device: parsed.device
+      };
+
+      setData(data => [...data, point])
     }
 
     return () => { ws.close() }
