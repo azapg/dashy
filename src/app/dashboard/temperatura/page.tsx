@@ -19,8 +19,6 @@ export default function Page() {
   const temperatures = useWebSocketData();
   const [temperatureStats, rateStats] = useTemperatureStats(temperatures);
 
-  console.log({temperatureStats, rateStats})
-
   return (
     <SidebarProvider
       style={
