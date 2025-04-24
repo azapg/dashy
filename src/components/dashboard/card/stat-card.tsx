@@ -1,28 +1,20 @@
-import {Card, CardAction, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {TrendBadge} from "@/components/dashboard/card/trend-badge";
 import {Trend} from "@/lib/stats";
+import {DataCard} from "@/components/dashboard/card/data-card";
 
 type StatCardData = {
   legend: string;
-  value?: number | null;
-  unit?: string | null;
-  trend?: Trend | null
+  value: number;
+  unit?: string;
+  trend: Trend
 }
 
 export function StatCard({legend, value, trend, unit}: StatCardData) {
-  if(!value || !trend) {
-    return <></>
+  let title = String(value);
+
+  if(unit) {
+    title = title + " " + unit;
   }
 
-  return <Card className="@container/card">
-    <CardHeader>
-      <CardDescription>{legend}</CardDescription>
-      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-        {value} {unit ?? <></>}
-      </CardTitle>
-      <CardAction>
-        <TrendBadge trend={trend}/>
-      </CardAction>
-    </CardHeader>
-  </Card>;
+  return <DataCard description={legend} title={title} action={<TrendBadge trend={trend}/>} />
 }

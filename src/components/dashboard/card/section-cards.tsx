@@ -1,29 +1,40 @@
 import {StatCard} from "@/components/dashboard/card/stat-card";
-import {StatPacket} from "@/lib/stats";
+import {StatResult} from "@/lib/stats";
+import {DataCard} from "@/components/dashboard/card/data-card";
 
 interface SectionCardsProps {
-  rate?: StatPacket | null,
-  temperature?: StatPacket | null
+  stats: StatResult
 }
 
 // TODO: make this very dynamic to make easy new stat "widgets"
-export function SectionCards({rate, temperature}: SectionCardsProps) {
-
-
+export function SectionCards({stats}: SectionCardsProps) {
   function TemperatureStatCard() {
-    if(temperature == null) {
-      return <></>
+    const stat = stats.temperature.stat;
+    const description = "Temperatura Promedio";
+    if(stats.temperature.status == 'insufficient-data' || stat == null) {
+      return <DataCard description={description} title={"Datos Insuficientes"} action={<></>} />
     }
 
-    return <StatCard legend={"Temperatura Promedio"} value={temperature.value} unit={"°C"} trend={temperature?.trend}/>;
+    return <StatCard
+      legend={description}
+      value={stat.value}
+      unit={"°C"}
+      trend={stat.trend}
+    />;
   }
 
   function RateStatCard() {
-    if(rate == null) {
-      return <></>
+    const stat = stats.rate.stat;
+    const description = "Datos por minuto";
+    if(stats.temperature.status == 'insufficient-data' || stat == null) {
+      return <DataCard description={description} title={"Datos Insuficientes"} action={<></>} />
     }
 
-    return <StatCard legend={"Datos por minuto"} value={rate.value} trend={rate?.trend}/>;
+    return <StatCard
+      legend={description}
+      value={stat.value}
+      trend={stat.trend}
+    />;
   }
 
   return (

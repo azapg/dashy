@@ -3,29 +3,36 @@ import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 import {
   computeAverage, computeRate, computeTrend,
   getLastMinuteData,
-  StatPacket,
+  StatPacket, StatResult,
 } from "@/lib/stats";
 import {useRef} from "react";
 
-type StatResult = [StatPacket, StatPacket] | [null, StatPacket] | [StatPacket, null] | [null, null];
+const INSUFFICIENT_DATA_RESULT: StatResult = {
+  temperature: {
+    status: 'insufficient-data'
+  },
+  rate: {
+    status: 'insufficient-data'
+  }
+}
 
 // TODO: Allow this hook to select a range of statistics, last minute, last hour, last day ...
-// TODO: I think the StatPacket thing is quite ugly, a big type with all the necessary data would be nicer.
 export function useTemperatureStats(
   data: TemperatureDataPoint[],
 ): StatResult {
   const lastMinuteData = getLastMinuteData(data);
-  const lastStatPackets = useRef<StatResult>([null, null]);
+  const lastResult = useRef<StatResult>(INSUFFICIENT_DATA_RESULT);
+
   if (lastMinuteData.length < 2) {
-    return [null, null];
+    return INSUFFICIENT_DATA_RESULT;
   }
 
   const averageTemperature = computeAverage(lastMinuteData);
   const rate = computeRate(lastMinuteData);
 
-  const lastTemperatureStatPacket = lastStatPackets.current[0];
+  const lastTemperatureStatPacket = lastResult.current.temperature.stat;
   const lastAvgTemperature = lastTemperatureStatPacket?.value || 0;
-  const lastRateStatPacket = lastStatPackets.current[1];
+  const lastRateStatPacket = lastResult.current.rate.stat;
   const lastRate = lastRateStatPacket?.value || 0;
 
   const temperatureTrend = computeTrend(averageTemperature, lastAvgTemperature);
@@ -41,7 +48,17 @@ export function useTemperatureStats(
     trend: rateTrend
   }
 
-  const result: StatResult = [temperatureStat, rateStat];
-  lastStatPackets.current = result
+  const result: StatResult = {
+    temperature: {
+      status: 'ok',
+      stat: temperatureStat
+    },
+    rate: {
+      status: 'ok',
+      stat: rateStat
+    }
+  }
+
+  lastResult.current = result
   return result;
 }

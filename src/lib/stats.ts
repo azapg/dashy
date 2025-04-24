@@ -6,9 +6,22 @@ export type Trend = {
   direction: TrendDirection;
 }
 
+export type StatStatus = 'ok' | 'insufficient-data';
+
 export type StatPacket = {
-  value?: number | null;
-  trend?: Trend | null;
+  value: number;
+  trend: Trend;
+}
+
+export type StatResult = {
+  temperature: {
+    status: StatStatus;
+    stat?: StatPacket;
+  },
+  rate: {
+    status: StatStatus;
+    stat?: StatPacket;
+  }
 }
 
 export type Range = {
