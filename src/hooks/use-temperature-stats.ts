@@ -1,10 +1,11 @@
 import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 
 import {
-  getLastMinuteData, getTrendDirection,
+  computeAverage, computeRate, computeTrend,
+  getLastMinuteData,
   StatPacket,
 } from "@/lib/stats";
-import {useMemo, useRef} from "react";
+import {useRef} from "react";
 
 type StatResult = [StatPacket, StatPacket] | [null, StatPacket] | [StatPacket, null] | [null, null];
 
@@ -15,57 +16,29 @@ export function useTemperatureStats(
 ): StatResult {
   const lastMinuteData = getLastMinuteData(data);
   const lastStatPackets = useRef<StatResult>([null, null]);
-
-  const averageTemperature = useMemo(() => {
-    let temperatures = 0;
-    lastMinuteData.forEach((point) => {
-      temperatures += Number(point.value);
-    })
-
-    return (temperatures / (lastMinuteData.length ?? 1));
-  }, [lastMinuteData]);
-
-
   if (lastMinuteData.length < 2) {
     return [null, null];
   }
 
-  let accumulatedSpans = 0;
-
-  for(let i = 1; i < lastMinuteData.length; i++) {
-    const previousDataPoint = lastMinuteData[i - 1];
-    const currentDataPoint = lastMinuteData[i];
-
-    const span = currentDataPoint.timestamp - previousDataPoint.timestamp;
-    accumulatedSpans += span;
-  }
-
-  const rate = lastMinuteData.length / (accumulatedSpans / 60_000);
+  const averageTemperature = computeAverage(lastMinuteData);
+  const rate = computeRate(lastMinuteData);
 
   const lastTemperatureStatPacket = lastStatPackets.current[0];
   const lastAvgTemperature = lastTemperatureStatPacket?.value || 0;
   const lastRateStatPacket = lastStatPackets.current[1];
   const lastRate = lastRateStatPacket?.value || 0;
 
-  const relativeRateDifference = (rate - lastRate) / (rate ?? 1);
-  const relativeThermalDifference = (averageTemperature - lastAvgTemperature) / (averageTemperature ?? 1);
-
-  const direction = getTrendDirection(relativeThermalDifference);
+  const temperatureTrend = computeTrend(averageTemperature, lastAvgTemperature);
+  const rateTrend = computeTrend(rate, lastRate);
 
   const temperatureStat: StatPacket = {
     value: Number(averageTemperature.toFixed(1)),
-    trend: {
-      percentage: Number((relativeThermalDifference * 100).toFixed(4)),
-      direction
-    }
+    trend: temperatureTrend
   }
 
   const rateStat: StatPacket = {
     value: Number(rate.toFixed(1)),
-    trend: {
-      percentage: Number((relativeRateDifference * 100).toFixed(2)),
-      direction: getTrendDirection(relativeThermalDifference)
-    }
+    trend: rateTrend
   }
 
   const result: StatResult = [temperatureStat, rateStat];
