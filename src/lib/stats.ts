@@ -7,8 +7,8 @@ export type Trend = {
 }
 
 export type StatPacket = {
-  value: number;
-  trend: Trend;
+  value?: number | null;
+  trend?: Trend | null;
 }
 
 export type Range = {

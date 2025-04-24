@@ -4,25 +4,21 @@ import {Trend} from "@/lib/stats";
 
 type StatCardData = {
   legend: string;
-  value: number;
+  value?: number;
   unit?: string;
-  trend: Trend
+  trend?: Trend
 }
 
 export function StatCard({legend, value, trend, unit}: StatCardData) {
-  let enoughData = true;
-
   if(!value || !trend) {
-    enoughData = false;
+    return <></>
   }
-
-  console.log(trend.percentage, legend)
 
   return <Card className="@container/card">
     <CardHeader>
       <CardDescription>{legend}</CardDescription>
       <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-        {enoughData ? <>{value} {unit ?? <></>}</> : "Sin datos"}
+        {value} {unit ?? <></>}
       </CardTitle>
       <CardAction>
         <TrendBadge trend={trend}/>
