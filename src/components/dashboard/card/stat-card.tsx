@@ -4,9 +4,9 @@ import {Trend} from "@/lib/stats";
 
 type StatCardData = {
   legend: string;
-  value?: number;
-  unit?: string;
-  trend?: Trend
+  value?: number | null;
+  unit?: string | null;
+  trend?: Trend | null
 }
 
 export function StatCard({legend, value, trend, unit}: StatCardData) {

@@ -2,8 +2,8 @@ import {StatCard} from "@/components/dashboard/card/stat-card";
 import {StatPacket} from "@/lib/stats";
 
 interface SectionCardsProps {
-  rate?: StatPacket,
-  temperature?: StatPacket
+  rate?: StatPacket | null,
+  temperature?: StatPacket | null
 }
 
 // TODO: make this very dynamic to make easy new stat "widgets"

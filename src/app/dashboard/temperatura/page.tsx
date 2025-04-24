@@ -12,10 +12,14 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 import {SectionCards} from "@/components/dashboard/card/section-cards";
+import {useTemperatureStats} from "@/hooks/use-temperature-stats";
 
 
 export default function Page() {
   const temperatures = useWebSocketData();
+  const [temperatureStats, rateStats] = useTemperatureStats(temperatures);
+
+  console.log({temperatureStats, rateStats})
 
   return (
     <SidebarProvider
@@ -32,19 +36,7 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <SectionCards rate={{
-                value: 1,
-                trend: {
-                  percentage: 1.1,
-                  direction: 'up'
-                }
-              }} temperature={{
-                value: 1,
-                trend: {
-                  percentage: 2.3,
-                  direction: 'up'
-                }
-              }} />
+              <SectionCards rate={rateStats} temperature={temperatureStats} />
               <div className="px-4 lg:px-6">
                 <ChartTimeseriesInteractive data={temperatures}/>
               </div>
