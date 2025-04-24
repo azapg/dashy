@@ -36,26 +36,26 @@ export function useTemperatureStats(
     const previousDataPoint = lastMinuteData[i - 1];
     const currentDataPoint = lastMinuteData[i];
 
-    const span = (currentDataPoint.timestamp - previousDataPoint.timestamp) / 1000;
+    const span = currentDataPoint.timestamp - previousDataPoint.timestamp;
     accumulatedSpans += span;
   }
 
-  const rate = accumulatedSpans / lastMinuteData.length;
+  const rate = lastMinuteData.length / (accumulatedSpans / 60_000);
 
   const lastTemperatureStatPacket = lastStatPackets.current[0];
   const lastAvgTemperature = lastTemperatureStatPacket?.value || 0;
   const lastRateStatPacket = lastStatPackets.current[1];
   const lastRate = lastRateStatPacket?.value || 0;
 
-  const relativeRateDifference = rate - lastRate / (rate ?? 1);
-  const relativeThermalDifference = averageTemperature - lastAvgTemperature / (averageTemperature ?? 1);
+  const relativeRateDifference = (rate - lastRate) / (rate ?? 1);
+  const relativeThermalDifference = (averageTemperature - lastAvgTemperature) / (averageTemperature ?? 1);
 
   const direction = getTrendDirection(relativeThermalDifference);
 
   const temperatureStat: StatPacket = {
     value: Number(averageTemperature.toFixed(1)),
     trend: {
-      percentage: Number((relativeThermalDifference * 100).toFixed(1)),
+      percentage: Number((relativeThermalDifference * 100).toFixed(4)),
       direction
     }
   }
@@ -63,7 +63,7 @@ export function useTemperatureStats(
   const rateStat: StatPacket = {
     value: Number(rate.toFixed(1)),
     trend: {
-      percentage: Number((relativeRateDifference * 100).toFixed(1)),
+      percentage: Number((relativeRateDifference * 100).toFixed(2)),
       direction: getTrendDirection(relativeThermalDifference)
     }
   }
