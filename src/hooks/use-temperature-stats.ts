@@ -1,11 +1,7 @@
 import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 
-import {
-  computeAverage, computeRate, computeTrend,
-  getLastMinuteData,
-  StatPacket, StatResult,
-} from "@/lib/stats";
-import {useRef} from "react";
+import {computeAverage, computeRate, computeTrend, getDataInRange, StatPacket, StatResult,} from "@/lib/stats";
+import {useEffect, useRef, useState} from "react";
 
 const INSUFFICIENT_DATA_RESULT: StatResult = {
   temperature: {
@@ -17,26 +13,76 @@ const INSUFFICIENT_DATA_RESULT: StatResult = {
 }
 
 // TODO: Allow this hook to select a range of statistics, last minute, last hour, last day ...
+const SNAPSHOT_INTERVAL = 60_000;
+
 export function useTemperatureStats(
   data: TemperatureDataPoint[],
 ): StatResult {
-  const lastMinuteData = getLastMinuteData(data);
-  const lastResult = useRef<StatResult>(INSUFFICIENT_DATA_RESULT);
+  const dataRef = useRef<TemperatureDataPoint[]>(data);
 
-  if (lastMinuteData.length < 2) {
+  const [averageTemperature, setAverageTemperature] = useState<number | null>(null);
+  const [rate, setRate] = useState<number | null>(null);
+
+  const [lastAverageTemperature, setLastAverageTemperature] = useState<number | null>(null);
+  const [lastRate, setLastRate] = useState<number | null>(null);
+
+  const computeSnapshotMetrics = (providedData?: TemperatureDataPoint[]) => {
+    const effectiveData = providedData ?? dataRef.current;
+
+    const now = Date.now();
+    const snapshotData = getDataInRange(effectiveData, {
+      start: now - SNAPSHOT_INTERVAL
+    })
+
+    if (!lastAverageTemperature || !lastRate) {
+      const previousData = getDataInRange(effectiveData, {
+        start: now - 2 * SNAPSHOT_INTERVAL,
+        end: now - SNAPSHOT_INTERVAL
+      })
+
+      const previousAverageTemperature = computeAverage(previousData);
+      const previousRate = computeRate(previousData)
+
+      setLastAverageTemperature(previousAverageTemperature)
+      setLastRate(previousRate)
+    }
+
+    const averageTemperature = computeAverage(snapshotData);
+    const rate = computeRate(snapshotData);
+
+    setAverageTemperature(averageTemperature);
+    setRate(rate);
+  }
+
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    // The use-websocket-data.ts, returns an array with the stored values
+    // from the server, once the server connection is established, the current
+    // data gets updated with those values, one by one. Then you could calculate
+    // the first metrics if the stored values are enough. Normally, the server
+    // stores the latest 50 points in a circular buffer.
+    //
+    // This solution is not the best though, once the server uses its own
+    // time series database, it should be restructured to handle data and
+    // aggregations more efficiently.
+    if(dataRef.current.length < 50 && data.length >= 50) {
+      computeSnapshotMetrics(data)
+    }
+
+    dataRef.current = data;
+  }, [data]);
+
+  useEffect(() => {
+    const interval = setInterval(computeSnapshotMetrics, SNAPSHOT_INTERVAL)
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!rate || !averageTemperature) {
     return INSUFFICIENT_DATA_RESULT;
   }
 
-  const averageTemperature = computeAverage(lastMinuteData);
-  const rate = computeRate(lastMinuteData);
-
-  const lastTemperatureStatPacket = lastResult.current.temperature.stat;
-  const lastAvgTemperature = lastTemperatureStatPacket?.value || 0;
-  const lastRateStatPacket = lastResult.current.rate.stat;
-  const lastRate = lastRateStatPacket?.value || 0;
-
-  const temperatureTrend = computeTrend(averageTemperature, lastAvgTemperature);
-  const rateTrend = computeTrend(rate, lastRate);
+  const temperatureTrend = computeTrend(averageTemperature, lastAverageTemperature ?? 0);
+  const rateTrend = computeTrend(rate, lastRate ?? 0);
 
   const temperatureStat: StatPacket = {
     value: Number(averageTemperature.toFixed(1)),
@@ -48,7 +94,7 @@ export function useTemperatureStats(
     trend: rateTrend
   }
 
-  const result: StatResult = {
+  return {
     temperature: {
       status: 'ok',
       stat: temperatureStat
@@ -57,8 +103,5 @@ export function useTemperatureStats(
       status: 'ok',
       stat: rateStat
     }
-  }
-
-  lastResult.current = result
-  return result;
+  };
 }

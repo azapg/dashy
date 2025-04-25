@@ -25,8 +25,24 @@ export type StatResult = {
 }
 
 export type Range = {
-  start: number,
-  end: number
+  start?: number;
+  end?: number;
+}
+
+export function getDataInRange(
+  data: TemperatureDataPoint[],
+  range?: Range
+): TemperatureDataPoint[] {
+  if (!range) {
+    return [...data];
+  }
+
+  const effectiveStart = range.start ?? -Infinity;
+  const effectiveEnd = range.end ?? Infinity;
+
+  return data.filter(
+    point => point.timestamp >= effectiveStart && point.timestamp <= effectiveEnd
+  );
 }
 
 export function getLastMinuteData(data: TemperatureDataPoint[]): TemperatureDataPoint[] {
