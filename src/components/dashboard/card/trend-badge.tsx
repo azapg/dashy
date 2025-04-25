@@ -1,6 +1,8 @@
 import {IconTrendingDown, IconTrendingUp, IconArrowNarrowRight} from "@tabler/icons-react";
 import {Badge} from "@/components/ui/badge";
 import {Trend} from "@/lib/stats";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "@/components/ui/tooltip";
+import Image from "next/image";
 
 interface TrendBadgeProps {
   trend?: Trend
@@ -20,9 +22,23 @@ export function TrendBadge({trend}: TrendBadgeProps) {
   }
 
   return (
-    <Badge variant="outline">
-      {icon}
-      <span className="trend">{trend.percentage}{trend?.percentage ? '%' : '0%'}</span>
-    </Badge>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <Badge variant="outline">
+            {icon}
+            <span className="trend">{trend.percentage}{trend?.percentage ? '%' : '0%'}</span>
+          </Badge>
+        </TooltipTrigger>
+        <TooltipContent>
+          <Image
+            src="/trend_eq.svg"
+            alt="Ecuación utilizada para el cálculo de la tendencia"
+            width={200}
+            height={75}
+          />
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
