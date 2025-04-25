@@ -56,6 +56,10 @@ export function computeAverage(data: TemperatureDataPoint[]): number {
 }
 
 export function computeRate(data: TemperatureDataPoint[]): number {
+  if(data.length < 2) {
+    return 0;
+  }
+
   let accumulatedSpans = 0;
 
   for(let i = 1; i < data.length; i++) {
