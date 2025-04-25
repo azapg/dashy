@@ -27,8 +27,7 @@ export function SectionCards({stats}: SectionCardsProps) {
   function RateStatCard() {
     const stat = stats.rate.stat;
     const description = "Datos por minuto";
-    if(stats.temperature.status == 'insufficient-data' || stat == null) {
-      return <DataCard description={description} title={"Datos Insuficientes"} action={<></>} />
+    if(stats.rate.status == 'insufficient-data' || stat == null) {
     }
 
     return <StatCard
