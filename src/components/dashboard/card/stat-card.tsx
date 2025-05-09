@@ -1,6 +1,6 @@
-import {Card, CardAction, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {TrendBadge} from "@/components/dashboard/card/trend-badge";
 import {Trend} from "@/lib/stats";
+import {DataCard} from "@/components/dashboard/card/data-card";
 
 type StatCardData = {
   legend: string;
@@ -10,23 +10,11 @@ type StatCardData = {
 }
 
 export function StatCard({legend, value, trend, unit}: StatCardData) {
-  let enoughData = true;
+  let title = String(value);
 
-  if(!value || !trend) {
-    enoughData = false;
+  if(unit) {
+    title = title + " " + unit;
   }
 
-  console.log(trend.percentage, legend)
-
-  return <Card className="@container/card">
-    <CardHeader>
-      <CardDescription>{legend}</CardDescription>
-      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-        {enoughData ? <>{value} {unit ?? <></>}</> : "Sin datos"}
-      </CardTitle>
-      <CardAction>
-        <TrendBadge trend={trend}/>
-      </CardAction>
-    </CardHeader>
-  </Card>;
+  return <DataCard description={legend} title={title} action={<TrendBadge trend={trend}/>} />
 }
