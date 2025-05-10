@@ -11,11 +11,15 @@ import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {loginFormSchema} from "@/components/auth/login-form-schema";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {loginUser} from "@/api/auth";
+import {toast} from "sonner";
+import {useRouter} from "next/navigation";
 
 export function LoginForm({
   className,
   ...props
 }: ComponentProps<"div">) {
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -25,8 +29,20 @@ export function LoginForm({
     }
   })
 
-  const onSubmit = (values: z.infer<typeof loginFormSchema>) => {
-    console.log(values);
+  const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
+    try {
+      const response = await loginUser(values)
+
+      if(response.success) {
+        router.push("/")
+        toast("Se ha iniciado sesión exitosamente.")
+      } else {
+        toast(`${response.error}`)
+      }
+    } catch (error) {
+      toast("Un error inesperado ha ocurrido. Por favor contacte con un administrador.")
+      console.error('Error submitting form:', error);
+    }
   }
 
   return (
