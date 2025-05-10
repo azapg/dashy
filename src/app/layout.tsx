@@ -4,7 +4,7 @@ import "./globals.css";
 import React from "react";
 import {ThemeProvider} from "@/components/theme-provider";
 import {Toaster} from "sonner";
-import {UserContext} from "@/context/user-context";
+import {UserProvider} from "@/context/user-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +36,7 @@ export default function RootLayout({
     <body
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-    <UserContext.Provider value={null} >
+    <UserProvider >
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
@@ -46,7 +46,7 @@ export default function RootLayout({
         {children}
         <Toaster />
       </ThemeProvider>
-    </UserContext.Provider>
+    </UserProvider>
     </body>
     </html>
   );
