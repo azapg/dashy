@@ -11,15 +11,17 @@ import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {loginFormSchema} from "@/components/auth/login-form-schema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {loginUser} from "@/api/auth";
 import {toast} from "sonner";
 import {useRouter} from "next/navigation";
+import {useAuth} from "@/context/auth-provider";
 
 export function LoginForm({
-  className,
-  ...props
-}: ComponentProps<"div">) {
+                            className,
+                            ...props
+                          }: ComponentProps<"div">) {
   const router = useRouter()
+  const {login} = useAuth();
+
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -31,18 +33,13 @@ export function LoginForm({
   })
 
   const onSubmit = async (values: z.infer<typeof loginFormSchema>) => {
-    try {
-      const response = await loginUser(values)
+    const response = await login(values.email, values.password, values.remember_me)
 
-      if(response.success) {
-        router.push("/")
-        toast("Se ha iniciado sesión exitosamente.")
-      } else {
-        toast(`${response.error}`)
-      }
-    } catch (error) {
-      toast("Un error inesperado ha ocurrido. Por favor contacte con un administrador.")
-      console.error('Error submitting form:', error);
+    if (response.success) {
+      toast.success("Se ha iniciado sesión satisfactoriamente.");
+      router.push("/")
+    } else {
+      toast.error(response.message);
     }
   }
 
@@ -57,7 +54,7 @@ export function LoginForm({
                 className="flex flex-col items-center gap-2 font-medium"
               >
                 <div className="flex size-8 items-center justify-center rounded-md">
-                  <IconBrain />
+                  <IconBrain/>
                 </div>
                 <span className="sr-only">Grupo Einsteins.</span>
               </a>
@@ -67,26 +64,26 @@ export function LoginForm({
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                render={({field}) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input placeholder="cat.lover@up.ac.pa" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                render={({field}) => (
                   <FormItem>
                     <FormLabel>Contraseña</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="shak@litas69" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage/>
                   </FormItem>
                 )}
               />
@@ -97,7 +94,8 @@ export function LoginForm({
           </div>
         </form>
       </Form>
-      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+      <div
+        className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
         ¿No tienes una cuenta?{" "}
         <a href="/register" className="underline underline-offset-4">
           Regístrate aquí

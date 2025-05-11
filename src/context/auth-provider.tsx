@@ -1,20 +1,14 @@
 import React, {createContext, useState, useContext, useEffect, ReactNode} from 'react';
 import {useRouter} from 'next/router';
-
-interface User {
-  user_id: number;
-  username: string;
-  email: string;
-  role_id?: number;
-  expires_at: string;
-}
+import {loginRequest, logoutRequest, registerRequest} from "@/api/auth";
+import {ApiResponse, User} from '@/api/types';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<{ success: boolean; error?: string }>;
-  register: (username: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<ApiResponse>;
+  register: (username: string, email: string, password: string) => Promise<ApiResponse>;
+  logout: () => Promise<ApiResponse>;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -76,82 +70,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   }, []);
 
-  const login = async (email: string, password: string, rememberMe: boolean = false): Promise<{
-    success: boolean;
-    error?: string
-  }> => {
-    try {
-      const res = await fetch('/api/auth/login.php', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({email, password, remember_me: rememberMe}),
-      });
+  const login = async (email: string, password: string, rememberMe: boolean = false): Promise<ApiResponse> => {
+    const response = await loginRequest({email, password, rememberMe});
 
-      const data: { success: boolean; data?: User; error?: string } = await res.json();
-
-      if (!res.ok) {
-        return {success: false, error: "Server responded with error"}
-      }
-
-      if (data.success && data.data) {
-        setUser(data.data);
-        return {success: true};
-      } else {
-        return {success: false, error: "Unknown error"}
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      return {success: false, error: "idk"};
+    if (response.success && response.data) {
+      setUser(response.data as User);
+    } else {
+      setUser(null);
     }
+
+    return response;
   };
 
-  const register = async (username: string, email: string, password: string): Promise<{
-    success: boolean;
-    error?: string
-  }> => {
-    try {
-      const res = await fetch('/api/auth/register.php', {
-        method: 'POST',
-        credentials: 'include', // Important for receiving cookies
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({username, email, password}),
-      });
+  const register = async (username: string, email: string, password: string): Promise<ApiResponse> => {
+    const response = await registerRequest({username, email, password});
 
-      const data: { success: boolean; data?: User; error?: string } = await res.json();
-
-      if (!res.ok) {
-        return {success: false, error: "Server responded with error"}
-      }
-
-      if (data.success && data.data) {
-        setUser(data.data);
-        return {success: true};
-      } else {
-        return {success: false, error: "Unknown error"}
-      }
-    } catch (error) {
-      console.error('Registration failed:', error);
-      return {success: false, error: "Unknown error"}
+    if (response.success && response.data) {
+      setUser(response.data as User);
+    } else {
+      setUser(null);
     }
+
+    return response;
   };
 
   const logout = async () => {
-    try {
-      await fetch('/api/auth/logout.php', {
-        method: 'POST',
-        credentials: 'include',
-      });
+    const response = await logoutRequest();
 
+    if(response.success) {
       setUser(null);
       await router.push('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
     }
+
+    return response;
   };
 
   const getCookie = (name: string): string | null => {

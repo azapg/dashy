@@ -11,15 +11,16 @@ import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {registerFormSchema} from "@/components/auth/register-form-schema";
-import {registerUser} from "@/api/auth";
 import {toast} from "sonner";
 import { useRouter } from 'next/navigation'
+import {useAuth} from "@/context/auth-provider";
 
 export function RegisterForm({
   className,
   ...props
 }: ComponentProps<"div">) {
   const router = useRouter()
+  const { register } = useAuth();
 
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
@@ -31,18 +32,13 @@ export function RegisterForm({
   })
 
   const onSubmit = async (values: z.infer<typeof registerFormSchema>) => {
-    try {
-      const response = await registerUser(values)
+    const response = await register(values.username, values.email, values.password);
 
-      if(response.success) {
-        router.push("/")
-        toast("Usuario creado exitosamente.")
-      } else {
-        toast(`${response.error}`)
-      }
-    } catch (error) {
-      toast("Un error inesperado ha ocurrido. Por favor contacte con un administrador.")
-      console.error('Error submitting form:', error);
+    if (response.success) {
+      toast.success("Cuanta registrada satisfactoriamente.");
+      router.push("/")
+    } else {
+      toast.error(response.message);
     }
   }
 
