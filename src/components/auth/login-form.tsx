@@ -26,6 +26,7 @@ export function LoginForm({
     defaultValues: {
       email: "",
       password: "",
+      remember_me: true
     }
   })
 
