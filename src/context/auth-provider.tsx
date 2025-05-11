@@ -1,5 +1,6 @@
+'use client';
+
 import React, {createContext, useState, useContext, useEffect, ReactNode} from 'react';
-import {useRouter} from 'next/router';
 import {loginRequest, logoutRequest, registerRequest} from "@/api/auth";
 import {ApiResponse, User} from '@/api/types';
 
@@ -30,14 +31,14 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const router = useRouter();
 
   useEffect(() => {
     try {
       const userInfoCookie = getCookie('user_info');
       if (userInfoCookie) {
         try {
-          const parsedUser: User = JSON.parse(userInfoCookie);
+          const decoded = decodeURIComponent(userInfoCookie);
+          const parsedUser: User = JSON.parse(decoded);
           setUser(parsedUser);
         } catch (e) {
           console.error('Failed to parse user_info cookie', e);
@@ -99,7 +100,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
 
     if(response.success) {
       setUser(null);
-      await router.push('/login');
     }
 
     return response;
