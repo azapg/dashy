@@ -12,12 +12,14 @@ import {NavDocuments} from "@/components/dashboard/nav-documents"
 import {NavMain} from "@/components/dashboard/nav-main"
 import {
   Sidebar,
-  SidebarContent,
+  SidebarContent, SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import {NavUser} from "@/components/dashboard/nav-user";
+import {useAuth} from "@/context/auth-provider";
 
 const data = {
   user: {
@@ -51,6 +53,8 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
 };
 
 export function AppSidebar({selected, ...props }: AppSidebarProps) {
+  const { user, isAuthenticated } = useAuth();
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -72,6 +76,12 @@ export function AppSidebar({selected, ...props }: AppSidebarProps) {
         <NavMain selected={selected}/>
         <NavDocuments items={data.documents}/>
       </SidebarContent>
+      <SidebarFooter >
+        { isAuthenticated ? <NavUser user={{
+          name: user?.username ?? "Unknown user",
+          email: "temporary@email.com"
+        }} /> : <></>}
+      </SidebarFooter>
     </Sidebar>
   )
 }
