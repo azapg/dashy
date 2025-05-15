@@ -10,8 +10,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
+import {useAuth} from "@/context/auth-provider";
 
-const adminView = false;
 
 const CreateExperimentButton = () => (
   <SidebarMenu>
@@ -32,11 +32,13 @@ interface NavMainProps {
 }
 
 export function NavMain({selected}: NavMainProps) {
+  const { isAdmin } = useAuth();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Paneles</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
-        {adminView ? <CreateExperimentButton/> : null}
+        {isAdmin ? <CreateExperimentButton/> : null}
         <SidebarMenu>
           <SidebarMenuItem key="Experimento Temperatura" className={`${selected == 1 ? 'bg-accent' : ''} rounded-md`}>
             <Link href="/dashboard/temperatura">
