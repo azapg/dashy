@@ -1,59 +1,84 @@
 "use client"
 
-import {IconCirclePlusFilled, IconTemperatureCelsius, IconDroplets} from "@tabler/icons-react"
+import {IconPlus} from "@tabler/icons-react"
 
 import {
-  SidebarGroup,
+  SidebarGroup, SidebarGroupAction,
   SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import Link from "next/link";
 import {useAuth} from "@/context/auth-provider";
+import {Skeleton} from "@/components/ui/skeleton";
+import {DynamicIcon} from "lucide-react/dynamic";
+import {useAppState} from "@/context/app-state-provider";
+import {useEffect, useState} from "react";
+import {Experiment, getExperiments} from "@/api/experiments";
+import { toast } from "sonner";
 
+interface ExperimentItemProps {
+  experiment: Experiment;
+  isSelected: boolean;
+  onClick: () => void
+}
 
-const CreateExperimentButton = () => (
+const ExperimentItem = ({experiment, isSelected, onClick}: ExperimentItemProps) => (
   <SidebarMenu>
-    <SidebarMenuItem className="flex items-center gap-2">
-      <SidebarMenuButton
-        tooltip="Quick Create"
-        className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-      >
-        <IconCirclePlusFilled/>
-        <span>Crear nuevo experimento</span>
+    <SidebarMenuItem key="Experimento Temperatura" className={`${isSelected ? 'bg-accent' : ''} rounded-md`}>
+      <SidebarMenuButton tooltip={experiment.title} onClick={() => onClick()}>
+        <DynamicIcon name={experiment.icon_name as never}/>
+        <span>{experiment.title}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   </SidebarMenu>
 )
 
-interface NavMainProps {
-  selected?: number | undefined
-}
+export function NavMain() {
+  const {isAdmin} = useAuth();
+  const {currentExperiment, setCurrentExperiment} = useAppState();
 
-export function NavMain({selected}: NavMainProps) {
-  const { isAdmin } = useAuth();
+  const [experiments, setExperiments] = useState<Experiment[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchExperiments = async () => {
+      const response = await getExperiments();
+
+      if(response.success && response.data) {
+        setExperiments(response.data.experiments)
+      } else {
+        toast.error("No se encontraron experimentos en la base de datos. Por favor contacte a un administrador.");
+      }
+    }
+
+    fetchExperiments().then(() => setLoading(false));
+  }, []);
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Paneles</SidebarGroupLabel>
+      {isAdmin ? (
+        <SidebarGroupAction title="Crear experimento">
+          <IconPlus/> <span className="sr-only">Crear experimento</span>
+        </SidebarGroupAction>
+      ) : null}
       <SidebarGroupContent className="flex flex-col gap-2">
-        {isAdmin ? <CreateExperimentButton/> : null}
         <SidebarMenu>
-          <SidebarMenuItem key="Experimento Temperatura" className={`${selected == 1 ? 'bg-accent' : ''} rounded-md`}>
-            <Link href="/dashboard/temperatura">
-              <SidebarMenuButton tooltip="Experimento Temperatura">
-                <IconTemperatureCelsius/>
-                <span>Experimento Temperatura</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem key="Experimento Humedad" className="rounded-md opacity-50">
-            <SidebarMenuButton tooltip="Experimento Humedad">
-              <IconDroplets/>
-              <span>Experimento Humedad</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {loading ? (
+            <>
+              {Array(3).fill(<Skeleton className="h-7"/>)}
+            </>
+          ) : (
+            experiments.map(experiment => (
+              <ExperimentItem
+                key={experiment.experiment_id}
+                experiment={experiment}
+                isSelected={currentExperiment?.experiment_id === experiment.experiment_id}
+                onClick={() => setCurrentExperiment(experiment)}
+              />
+            ))
+          )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

@@ -48,11 +48,7 @@ const data = {
   ],
 }
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  selected?: number;
-};
-
-export function AppSidebar({selected, ...props }: AppSidebarProps) {
+export function AppSidebar({...props }: React.ComponentProps<typeof Sidebar> & {}) {
   const { user, isAuthenticated } = useAuth();
 
   return (
@@ -73,7 +69,7 @@ export function AppSidebar({selected, ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain selected={selected}/>
+        <NavMain />
         <NavDocuments items={data.documents}/>
       </SidebarContent>
       <SidebarFooter >
