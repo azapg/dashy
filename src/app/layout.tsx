@@ -5,6 +5,7 @@ import React from "react";
 import {ThemeProvider} from "@/components/theme-provider";
 import {Toaster} from "sonner";
 import {AuthProvider} from "@/context/auth-provider";
+import {AppStateProvider} from "@/context/app-state-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,15 +38,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
     <AuthProvider >
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        {children}
-        <Toaster />
-      </ThemeProvider>
+      <AppStateProvider >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster />
+        </ThemeProvider>
+      </AppStateProvider>
     </AuthProvider>
     </body>
     </html>
