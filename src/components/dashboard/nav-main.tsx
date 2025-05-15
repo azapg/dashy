@@ -7,15 +7,14 @@ import {
   SidebarGroupContent, SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem,
+  SidebarMenuItem, SidebarMenuSkeleton,
 } from "@/components/ui/sidebar"
 import {useAuth} from "@/context/auth-provider";
-import {Skeleton} from "@/components/ui/skeleton";
 import {DynamicIcon} from "lucide-react/dynamic";
 import {useAppState} from "@/context/app-state-provider";
 import {useEffect, useState} from "react";
 import {Experiment, getExperiments} from "@/api/experiments";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 interface ExperimentItemProps {
   experiment: Experiment;
@@ -45,7 +44,7 @@ export function NavMain() {
     const fetchExperiments = async () => {
       const response = await getExperiments();
 
-      if(response.success && response.data) {
+      if (response.success && response.data) {
         setExperiments(response.data.experiments)
       } else {
         toast.error("No se encontraron experimentos en la base de datos. Por favor contacte a un administrador.");
@@ -67,7 +66,11 @@ export function NavMain() {
         <SidebarMenu>
           {loading ? (
             <>
-              {Array(3).fill(<Skeleton className="h-7"/>)}
+              {Array.from({length: 5}).map((_, index) => (
+                <SidebarMenuItem key={index}>
+                  <SidebarMenuSkeleton/>
+                </SidebarMenuItem>
+              ))}
             </>
           ) : (
             experiments.map(experiment => (
