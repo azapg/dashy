@@ -25,7 +25,7 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" selected={1}/>
+      <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader heading={"Experimento Temperatura"} />
         <div className="flex flex-1 flex-col">

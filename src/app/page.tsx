@@ -8,8 +8,12 @@ import {
 
 import React from "react";
 import {SiteHeader} from "@/components/dashboard/site-header";
+import {useAppState} from "@/context/app-state-provider";
+import {ExperimentDashboard} from "@/components/dashboard/experiment-dashboard";
 
 export default function Page() {
+  const { currentExperiment } = useAppState();
+
   return (
     <SidebarProvider
       style={
@@ -21,10 +25,14 @@ export default function Page() {
     >
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader heading={"Grupo Einsteins"} />
-        <div className={"w-full h-full flex items-center justify-center"}>
-          <p>Seleccione un experimento para visualizar</p>
-        </div>
+        <SiteHeader heading={currentExperiment?.title ?? ""} />
+        { currentExperiment ? (
+          <ExperimentDashboard />
+        ) : (
+          <div className={"w-full h-full flex items-center justify-center"}>
+            <p>Seleccione un experimento para visualizar</p>
+          </div>
+        )}
       </SidebarInset>
     </SidebarProvider>
   )

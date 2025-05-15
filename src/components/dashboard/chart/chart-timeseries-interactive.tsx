@@ -30,11 +30,9 @@ import {
 } from "@/components/ui/toggle-group"
 import {parseTimeRange} from "@/lib/parse";
 
-export const description = "Un gráfico de área interactivo"
-
-import {TemperatureDataPoint} from "@/experiments/temperature/columns";
 import {formatDate} from "@/lib/date";
 import {useEffect} from "react";
+import {DataPoint} from "@/experiments/columns";
 
 const chartConfig = {
   temperature: {
@@ -45,7 +43,7 @@ const chartConfig = {
 
 
 interface ChartAreaInteractiveProps {
-  data: TemperatureDataPoint[]
+  data: DataPoint[]
 }
 
 const useDynamicAxisData = (): [number, number, number[]] => {

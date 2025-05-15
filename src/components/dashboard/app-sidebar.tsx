@@ -70,7 +70,7 @@ export function AppSidebar({...props }: React.ComponentProps<typeof Sidebar> & {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
-        <NavDocuments items={data.documents}/>
+          <NavDocuments items={data.documents}/>
       </SidebarContent>
       <SidebarFooter >
         { isAuthenticated ? <NavUser user={{
