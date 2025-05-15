@@ -14,9 +14,9 @@ export type ServerResponse = {
   data?: object;
 }
 
-export type ApiResponse = {
+export type ApiResponse<T> = {
   success: boolean;
   message?: string;
   error?: string;
-  data?: object;
+  data?: T;
 }

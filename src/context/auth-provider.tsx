@@ -7,9 +7,9 @@ import {ApiResponse, User} from '@/api/types';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, rememberMe?: boolean) => Promise<ApiResponse>;
-  register: (username: string, email: string, password: string) => Promise<ApiResponse>;
-  logout: () => Promise<ApiResponse>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<ApiResponse<User>>;
+  register: (username: string, email: string, password: string) => Promise<ApiResponse<User>>;
+  logout: () => Promise<ApiResponse<{ session_invalidated: boolean }>>;
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
@@ -71,11 +71,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   }, []);
 
-  const login = async (email: string, password: string, rememberMe: boolean = false): Promise<ApiResponse> => {
+  const login = async (email: string, password: string, rememberMe: boolean = false): Promise<ApiResponse<User>> => {
     const response = await loginRequest({email, password, rememberMe});
 
     if (response.success && response.data) {
-      setUser(response.data as User);
+      setUser(response.data);
     } else {
       setUser(null);
     }
@@ -83,11 +83,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     return response;
   };
 
-  const register = async (username: string, email: string, password: string): Promise<ApiResponse> => {
+  const register = async (username: string, email: string, password: string): Promise<ApiResponse<User>> => {
     const response = await registerRequest({username, email, password});
 
     if (response.success && response.data) {
-      setUser(response.data as User);
+      setUser(response.data);
     } else {
       setUser(null);
     }

@@ -1,22 +1,22 @@
 import {ApiResponse, Payload, ServerResponse} from "@/api/types";
 
-export async function get(route: string, body?: Payload) {
-  return safeFetch(route, 'GET', body);
+export async function get<T>(route: string, body?: Payload) {
+  return safeFetch<T>(route, 'GET', body);
 }
 
-export async function post(route: string, body?: Payload) {
-  return safeFetch(route, 'POST', body);
+export async function post<T>(route: string, body?: Payload) {
+  return safeFetch<T>(route, 'POST', body);
 }
 
-export async function put(route: string, body?: Payload) {
-  return safeFetch(route, 'PUT', body);
+export async function put<T>(route: string, body?: Payload) {
+  return safeFetch<T>(route, 'PUT', body);
 }
 
-export async function del(route: string, body?: Payload) {
-  return safeFetch(route, 'DELETE', body);
+export async function del<T>(route: string, body?: Payload) {
+  return safeFetch<T>(route, 'DELETE', body);
 }
 
-async function safeFetch(route: string, method: string, body?: Payload): Promise<ApiResponse> {
+async function safeFetch<T>(route: string, method: string, body?: Payload): Promise<ApiResponse<T>> {
   try {
     const response = await fetch('/api/' + route, {
       method,
@@ -34,7 +34,7 @@ async function safeFetch(route: string, method: string, body?: Payload): Promise
     }
 
     if(serverResponse.success && serverResponse.data) {
-      return success(serverResponse.data, serverResponse.message);
+      return success<T>(serverResponse.data, serverResponse.message);
     } else {
       return err(`Couldn't receive data from the server. ${response.statusText}`);
     }
@@ -44,17 +44,17 @@ async function safeFetch(route: string, method: string, body?: Payload): Promise
   }
 }
 
-function err(message: string): ApiResponse {
+function err<T>(message: string): ApiResponse<T> {
   return {
     success: false,
     error: message
   }
 }
 
-function success(data: object, message?: string): ApiResponse {
+function success<T>(data: object, message?: string): ApiResponse<T> {
   return {
     success: true,
     message,
-    data,
+    data: data as T,
   }
 }

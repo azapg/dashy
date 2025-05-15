@@ -1,5 +1,5 @@
 import {post} from "@/lib/fetch";
-import {Payload} from "@/api/types";
+import {Payload, User} from "@/api/types";
 
 export interface UserRegistrationPayload extends Payload {
   username: string;
@@ -14,13 +14,13 @@ export interface UserLoginPayload extends Payload {
 }
 
 export async function registerRequest(user: UserRegistrationPayload) {
-  return await post('auth/register.php', user)
+  return await post<User>('auth/register.php', user)
 }
 
 export async function loginRequest(user: UserLoginPayload) {
-  return await post('auth/login.php', user)
+  return await post<User>('auth/login.php', user)
 }
 
 export async function logoutRequest() {
-  return await post('auth/logout.php')
+  return await post<{ session_invalidated: boolean }>('auth/logout.php')
 }
